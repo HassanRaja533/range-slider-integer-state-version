@@ -1,5 +1,5 @@
-// const range = require('range-slider-hr')
-// const integer = require('input-integer-ui-hassan_raja')
+ const range = require('range-slider-state-version-hr')
+ const integer = require('input-integer-state-version-hr')
 
 module.exports = range_slider_integer
 

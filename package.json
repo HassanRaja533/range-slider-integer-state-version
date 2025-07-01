@@ -20,7 +20,9 @@
   "homepage": "https://github.com/HassanRaja533/range-slider-integer-state-version#readme",
   "dependencies": {
     "browserify": "^17.0.1",
-    "budo": "^11.8.4"
+    "budo": "^11.8.4",
+    "input-integer-state-version-hr": "^0.0.1",
+    "range-slider-state-version-hr": "^0.0.1"
   },
   "devDependencies": {
     "standardx": "^7.0.0"
