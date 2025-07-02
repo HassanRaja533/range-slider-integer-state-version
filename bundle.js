@@ -691,7 +691,8 @@ async function range_slider_integer (opts) {
     value: handleValue,
     style: inject
   }
-   await sdb.watch(onbatch)
+  
+  await sdb.watch(onbatch)
 
   
 
@@ -702,8 +703,8 @@ async function range_slider_integer (opts) {
   const rsi = document.createElement('div')
   rsi.classList.add('rsi')
 
-  const range_slider = range(opts, protocol)
-  const input_integer = integer(opts, protocol)
+  const range_slider = await range({min: 0, max: 10}, protocol)
+  const input_integer = await integer({min: 0, max: 10}, protocol)
 
   
   rsi.append(range_slider, input_integer)
@@ -738,6 +739,17 @@ async function range_slider_integer (opts) {
   }
 
 
+// Batch event dispatcher
+function onbatch(batch) {
+  console.log('📦 Watch triggered with batch:', batch)
+  for (const { type, data } of batch) {
+    if (on[type]) {
+      on[type](data)
+    }
+  }
+}
+
+
   function inject(data) {
     console.log('Injecting style:', data)
     const sheet = new CSSStyleSheet()
@@ -763,6 +775,23 @@ function fallback_module () {
   return {
     drive: {},
     api: fallback_instance,// Used to customize API (like styles or icons)
+    
+    _: {
+      'range-slider-state-version-hr': {
+        $: '', 
+        // mapping: {
+        //   style: 'style',
+        //   data: 'data'
+        // }
+      },
+      'input-integer-state-version-hr': {
+        $: '',
+        // mapping: {
+        //   style: 'style',
+        //   data: 'data'
+        // }
+      }
+    }
   }
 
   function fallback_instance() {
@@ -782,24 +811,8 @@ function fallback_module () {
           `
         }
       }
-    },
-
-    _: {
-      'range-slider-state-version-hr': {
-        $: '', 
-        // mapping: {
-        //   style: 'style',
-        //   data: 'data'
-        // }
-      },
-      'input-integer-state-version-hr': {
-        $: '',
-        // mapping: {
-        //   style: 'style',
-        //   data: 'data'
-        // }
-      }
     }
+
   };
 }
 
@@ -838,6 +851,17 @@ async function main() {
   document.body.append(rsi)
 }
 main()
+
+// Batch event dispatcher
+function onbatch(batch) {
+  console.log('📦 Watch triggered with batch:', batch)
+  for (const { type, data } of batch) {
+    if (on[type]) {
+      on[type](data)
+    }
+  }
+}
+
 
 function fallback_module() {
   return {

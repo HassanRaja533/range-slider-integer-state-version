@@ -9,7 +9,6 @@
  module.exports = range_slider_integer
 
 async function range_slider_integer (opts) {
-
   console.log('SID:', opts.sid)
   const { id, sdb } = await get(opts.sid)
 
@@ -17,9 +16,11 @@ async function range_slider_integer (opts) {
     value: handleValue,
     style: inject
   }
-   await sdb.watch(onbatch)
-
   
+  await sdb.watch(onbatch)
+  
+  
+//const config = await sdb.drive.get('data/opts.json')
 
   const state = {}
   const el = document.createElement('div')
@@ -28,9 +29,9 @@ async function range_slider_integer (opts) {
   const rsi = document.createElement('div')
   rsi.classList.add('rsi')
 
-  const range_slider = range(opts, protocol)
-  const input_integer = integer(opts, protocol)
-
+  const input_integer = await integer({ sid: opts.sid }, protocol)
+const range_slider = await range({ sid: opts.sid }, protocol)
+  
   
   rsi.append(range_slider, input_integer)
 
@@ -64,6 +65,17 @@ async function range_slider_integer (opts) {
   }
 
 
+// Batch event dispatcher
+function onbatch(batch) {
+  console.log('📦 Watch triggered with batch:', batch)
+  for (const { type, data } of batch) {
+    if (on[type]) {
+      on[type](data)
+    }
+  }
+}
+
+
   function inject(data) {
     console.log('Injecting style:', data)
     const sheet = new CSSStyleSheet()
@@ -89,9 +101,28 @@ function fallback_module () {
   return {
     drive: {},
     api: fallback_instance,// Used to customize API (like styles or icons)
+    
+    _: {
+      'range-slider-state-version-hr': {
+        $: '', 
+        0: { value: { min: 0, max: 10 } },
+        // mapping: {
+        //   style: 'style',
+        //   data: 'data'
+        // }
+      },
+      'input-integer-state-version-hr': {
+        $: '',
+        0: { value: { min: 0, max: 10 } },
+        // mapping: {
+        //   style: 'style',
+        //   data: 'data'
+        // }
+      }
+    }
   }
 
-  function fallback_instance() {
+  function fallback_instance(opts) {
   //console.log('make instance:', opts);
   return {
     drive: {
@@ -107,25 +138,16 @@ function fallback_module () {
             }
           `
         }
-      }
-    },
-
-    _: {
-      'range-slider-state-version-hr': {
-        $: '', 
-        // mapping: {
-        //   style: 'style',
-        //   data: 'data'
-        // }
       },
-      'input-integer-state-version-hr': {
-        $: '',
-        // mapping: {
-        //   style: 'style',
-        //   data: 'data'
-        // }
-      }
+      'data/': {
+          'opts.json': {
+            raw: opts 
+          }
+        }
     }
+
+        
+
   };
 }
 
