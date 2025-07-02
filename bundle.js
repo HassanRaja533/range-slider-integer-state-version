@@ -671,12 +671,30 @@ function fallback_module () {
 },{"STATE":4}],4:[function(require,module,exports){
 
 },{}],5:[function(require,module,exports){
+(function (__filename){(function (){
+ const STATE = require('STATE') // Import custom STATE module for managing local state and drive
+ const statedb = STATE(__filename) // Bind STATE to this module file for namespaced storage
+ const { sdb, get } = statedb(fallback_module) // Initialize state DB with fallback data and get tools
+
+ 
  const range = require('range-slider-state-version-hr')
  const integer = require('input-integer-state-version-hr')
 
-module.exports = range_slider_integer
+ module.exports = range_slider_integer
 
-function range_slider_integer (opts) {
+async function range_slider_integer (opts) {
+
+  console.log('SID:', opts.sid)
+  const { id, sdb } = await get(opts.sid)
+
+  const on = {
+    value: handleValue,
+    style: inject
+  }
+   await sdb.watch(onbatch)
+
+  
+
   const state = {}
   const el = document.createElement('div')
   const shadow = el.attachShadow({ mode: 'closed' })
@@ -687,12 +705,16 @@ function range_slider_integer (opts) {
   const range_slider = range(opts, protocol)
   const input_integer = integer(opts, protocol)
 
+  
   rsi.append(range_slider, input_integer)
 
-  const style = document.createElement('style')
-  style.textContent = get_theme()
+  // const style = document.createElement('style')
+  // style.textContent = get_theme()
+  // Get and inject the CSS from virtual drive
+   const css = await sdb.drive.get('style/theme.css')
+   inject(css)
 
-  shadow.append(rsi, style)
+  shadow.append(rsi)//, style)
 
   return el
 
@@ -715,20 +737,77 @@ function range_slider_integer (opts) {
     }
   }
 
-  function get_theme () {
-    return `
-      .rsi {
-        padding: 5%;
-        display: grid;
-        grid-template-columns: 8fr 1fr;
-        align-items: center;
-        justify-items: center;
-      }
-    `
+
+  function inject(data) {
+    console.log('Injecting style:', data)
+    const sheet = new CSSStyleSheet()
+
+    if (data?.raw) {
+    sheet.replaceSync(data.raw || '') // ensure raw exists
+    shadow.adoptedStyleSheets = [sheet]
+    }
   }
+
+
+    function handleValue(data) {
+    console.log(`✅ SID "${data.id}" value is now:`, data.value)
+  }
+ 
 }
 
-},{"input-integer-state-version-hr":1,"range-slider-state-version-hr":3}],6:[function(require,module,exports){
+
+// ============ Fallback Setup for STATE ============
+
+// This fallback_module function is required for STATE initialization
+function fallback_module () {
+  return {
+    drive: {},
+    api: fallback_instance,// Used to customize API (like styles or icons)
+  }
+
+  function fallback_instance() {
+  //console.log('make instance:', opts);
+  return {
+    drive: {
+      'style/': {
+        'theme.css': {
+          raw: `
+            .rsi {
+              padding: 5%;
+              display: grid;
+              grid-template-columns: 8fr 1fr;
+              align-items: center;
+              justify-items: center;
+            }
+          `
+        }
+      }
+    },
+
+    _: {
+      'range-slider-state-version-hr': {
+        $: '', 
+        // mapping: {
+        //   style: 'style',
+        //   data: 'data'
+        // }
+      },
+      'input-integer-state-version-hr': {
+        $: '',
+        // mapping: {
+        //   style: 'style',
+        //   data: 'data'
+        // }
+      }
+    }
+  };
+}
+
+}
+}).call(this)}).call(this,"/src/index.js")
+},{"STATE":6,"input-integer-state-version-hr":1,"range-slider-state-version-hr":3}],6:[function(require,module,exports){
+arguments[4][4][0].apply(exports,arguments)
+},{"dup":4}],7:[function(require,module,exports){
 const prefix = 'https://raw.githubusercontent.com/alyhxn/playproject/main/'
 const init_url = prefix + 'src/node_modules/init.js'
 
@@ -741,12 +820,41 @@ fetch(init_url, { cache: 'no-store' }).then(res => res.text()).then(async source
   require('./page') // or whatever is otherwise the main entry of our project
 })
 
-},{"./page":7}],7:[function(require,module,exports){
+},{"./page":8}],8:[function(require,module,exports){
+(function (__filename){(function (){
+// page.js
+const STATE = require('../src/node_modules/STATE')
+const statedb = STATE(__filename)
+const { sdb, get } = statedb(fallback_module)
+
+
 const range_slider_integer = require('..')
 
 const opts = { min: 0, max: 10 }
-const rsi = range_slider_integer(opts)
 
-document.body.append(rsi)
+async function main() {
+  const subs = await sdb.watch(onbatch)
+  const rsi = await range_slider_integer(subs[0])
+  document.body.append(rsi)
+}
+main()
 
-},{"..":5}]},{},[6]);
+function fallback_module() {
+  return {
+    drive:{}
+    ,
+    _: {
+     '..': {    
+        $:'' ,
+        0: { value: { min: 0, max: 10 }  },
+        mapping: {
+          style: 'style',
+          data: 'data'
+        }    
+      }
+    }
+  };
+}
+
+}).call(this)}).call(this,"/web/page.js")
+},{"..":5,"../src/node_modules/STATE":6}]},{},[7]);

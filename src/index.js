@@ -1,9 +1,26 @@
+ const STATE = require('STATE') // Import custom STATE module for managing local state and drive
+ const statedb = STATE(__filename) // Bind STATE to this module file for namespaced storage
+ const { sdb, get } = statedb(fallback_module) // Initialize state DB with fallback data and get tools
+
+ 
  const range = require('range-slider-state-version-hr')
  const integer = require('input-integer-state-version-hr')
 
-module.exports = range_slider_integer
+ module.exports = range_slider_integer
 
-function range_slider_integer (opts) {
+async function range_slider_integer (opts) {
+
+  console.log('SID:', opts.sid)
+  const { id, sdb } = await get(opts.sid)
+
+  const on = {
+    value: handleValue,
+    style: inject
+  }
+   await sdb.watch(onbatch)
+
+  
+
   const state = {}
   const el = document.createElement('div')
   const shadow = el.attachShadow({ mode: 'closed' })
@@ -14,12 +31,16 @@ function range_slider_integer (opts) {
   const range_slider = range(opts, protocol)
   const input_integer = integer(opts, protocol)
 
+  
   rsi.append(range_slider, input_integer)
 
-  const style = document.createElement('style')
-  style.textContent = get_theme()
+  // const style = document.createElement('style')
+  // style.textContent = get_theme()
+  // Get and inject the CSS from virtual drive
+   const css = await sdb.drive.get('style/theme.css')
+   inject(css)
 
-  shadow.append(rsi, style)
+  shadow.append(rsi)//, style)
 
   return el
 
@@ -42,15 +63,70 @@ function range_slider_integer (opts) {
     }
   }
 
-  function get_theme () {
-    return `
-      .rsi {
-        padding: 5%;
-        display: grid;
-        grid-template-columns: 8fr 1fr;
-        align-items: center;
-        justify-items: center;
-      }
-    `
+
+  function inject(data) {
+    console.log('Injecting style:', data)
+    const sheet = new CSSStyleSheet()
+
+    if (data?.raw) {
+    sheet.replaceSync(data.raw || '') // ensure raw exists
+    shadow.adoptedStyleSheets = [sheet]
+    }
   }
+
+
+    function handleValue(data) {
+    console.log(`✅ SID "${data.id}" value is now:`, data.value)
+  }
+ 
+}
+
+
+// ============ Fallback Setup for STATE ============
+
+// This fallback_module function is required for STATE initialization
+function fallback_module () {
+  return {
+    drive: {},
+    api: fallback_instance,// Used to customize API (like styles or icons)
+  }
+
+  function fallback_instance() {
+  //console.log('make instance:', opts);
+  return {
+    drive: {
+      'style/': {
+        'theme.css': {
+          raw: `
+            .rsi {
+              padding: 5%;
+              display: grid;
+              grid-template-columns: 8fr 1fr;
+              align-items: center;
+              justify-items: center;
+            }
+          `
+        }
+      }
+    },
+
+    _: {
+      'range-slider-state-version-hr': {
+        $: '', 
+        // mapping: {
+        //   style: 'style',
+        //   data: 'data'
+        // }
+      },
+      'input-integer-state-version-hr': {
+        $: '',
+        // mapping: {
+        //   style: 'style',
+        //   data: 'data'
+        // }
+      }
+    }
+  };
+}
+
 }

@@ -21,7 +21,7 @@
   "dependencies": {
     "browserify": "^17.0.1",
     "budo": "^11.8.4",
-    "input-integer-state-version-hr": "^0.0.1",
+    "input-integer-state-version-hr": "^0.0.3",
     "range-slider-state-version-hr": "^0.0.1"
   },
   "devDependencies": {
