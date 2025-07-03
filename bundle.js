@@ -682,10 +682,10 @@ function fallback_module () {
 
  module.exports = range_slider_integer
 
-async function range_slider_integer (opts) {
-
-  console.log('SID:', opts.sid)
-  const { id, sdb } = await get(opts.sid)
+ async function range_slider_integer (opts) {
+   console.log(' range_slider_integer received opts:', opts)
+   console.log('SID:', opts.sid)
+   const { id, sdb } = await get(opts.sid)
 
   const on = {
     value: handleValue,
@@ -693,8 +693,9 @@ async function range_slider_integer (opts) {
   }
   
   await sdb.watch(onbatch)
-
   
+  
+  //const config = await sdb.drive.get('data/opts.json')
 
   const state = {}
   const el = document.createElement('div')
@@ -703,9 +704,9 @@ async function range_slider_integer (opts) {
   const rsi = document.createElement('div')
   rsi.classList.add('rsi')
 
-  const range_slider = await range({min: 0, max: 10}, protocol)
-  const input_integer = await integer({min: 0, max: 10}, protocol)
-
+  const input_integer = await integer(opts.sid, protocol)
+  const range_slider = await range(opts.sid, protocol)
+  
   
   rsi.append(range_slider, input_integer)
 
@@ -794,7 +795,7 @@ function fallback_module () {
     }
   }
 
-  function fallback_instance() {
+  function fallback_instance(opts) {
   //console.log('make instance:', opts);
   return {
     drive: {
@@ -810,9 +811,13 @@ function fallback_module () {
             }
           `
         }
-      }
+      },
+      'data/': {
+          'opts.json': {
+            raw: opts 
+          }
+        }
     }
-
   };
 }
 
@@ -847,6 +852,7 @@ const opts = { min: 0, max: 10 }
 
 async function main() {
   const subs = await sdb.watch(onbatch)
+  console.log(subs)
   const rsi = await range_slider_integer(subs[0])
   document.body.append(rsi)
 }
@@ -854,7 +860,7 @@ main()
 
 // Batch event dispatcher
 function onbatch(batch) {
-  console.log('📦 Watch triggered with batch:', batch)
+  console.log(' Watch triggered with batch:', batch)
   for (const { type, data } of batch) {
     if (on[type]) {
       on[type](data)
@@ -874,9 +880,9 @@ function fallback_module() {
         mapping: {
           style: 'style',
           data: 'data'
-        }    
-      }
-    }
+        } 
+
+      }}
   };
 }
 

@@ -10,14 +10,15 @@ const opts = { min: 0, max: 10 }
 
 async function main() {
   const subs = await sdb.watch(onbatch)
-  const rsi = await range_slider_integer(opts)
+  console.log(subs)
+  const rsi = await range_slider_integer(subs[0])
   document.body.append(rsi)
 }
 main()
 
 // Batch event dispatcher
 function onbatch(batch) {
-  console.log('📦 Watch triggered with batch:', batch)
+  console.log(' Watch triggered with batch:', batch)
   for (const { type, data } of batch) {
     if (on[type]) {
       on[type](data)

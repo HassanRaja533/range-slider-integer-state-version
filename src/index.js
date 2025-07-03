@@ -8,9 +8,10 @@
 
  module.exports = range_slider_integer
 
-async function range_slider_integer (opts) {
-  console.log('SID:', opts.sid)
-  const { id, sdb } = await get(opts.sid)
+ async function range_slider_integer (opts) {
+   console.log(' range_slider_integer received opts:', opts)
+   console.log('SID:', opts.sid)
+   const { id, sdb } = await get(opts.sid)
 
   const on = {
     value: handleValue,
@@ -20,7 +21,7 @@ async function range_slider_integer (opts) {
   await sdb.watch(onbatch)
   
   
-//const config = await sdb.drive.get('data/opts.json')
+  //const config = await sdb.drive.get('data/opts.json')
 
   const state = {}
   const el = document.createElement('div')
@@ -29,8 +30,8 @@ async function range_slider_integer (opts) {
   const rsi = document.createElement('div')
   rsi.classList.add('rsi')
 
-  const input_integer = await integer({ sid: opts.sid }, protocol)
-const range_slider = await range({ sid: opts.sid }, protocol)
+  const input_integer = await integer(opts.sid, protocol)
+  const range_slider = await range(opts.sid, protocol)
   
   
   rsi.append(range_slider, input_integer)
@@ -105,7 +106,6 @@ function fallback_module () {
     _: {
       'range-slider-state-version-hr': {
         $: '', 
-        0: { value: { min: 0, max: 10 } },
         // mapping: {
         //   style: 'style',
         //   data: 'data'
@@ -113,7 +113,6 @@ function fallback_module () {
       },
       'input-integer-state-version-hr': {
         $: '',
-        0: { value: { min: 0, max: 10 } },
         // mapping: {
         //   style: 'style',
         //   data: 'data'
@@ -145,9 +144,6 @@ function fallback_module () {
           }
         }
     }
-
-        
-
   };
 }
 
