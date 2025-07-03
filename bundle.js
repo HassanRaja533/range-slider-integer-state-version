@@ -692,31 +692,30 @@ function fallback_module () {
     style: inject
   }
   
-  await sdb.watch(onbatch)
-  
-  
+    await sdb.watch(onbatch)
+   
   //const config = await sdb.drive.get('data/opts.json')
 
-  const state = {}
-  const el = document.createElement('div')
-  const shadow = el.attachShadow({ mode: 'closed' })
+    const state = {}
+    const el = document.createElement('div')
+    const shadow = el.attachShadow({ mode: 'closed' })
 
-  const rsi = document.createElement('div')
-  rsi.classList.add('rsi')
+    const rsi = document.createElement('div')
+    rsi.classList.add('rsi')
 
-  const input_integer = await integer(opts.sid, protocol)
-  const range_slider = await range(opts.sid, protocol)
+    const input_integer = await integer(opts.sid, protocol)
+    const range_slider = await range(opts.sid, protocol)
   
   
-  rsi.append(range_slider, input_integer)
+    rsi.append(range_slider, input_integer)
 
-  // const style = document.createElement('style')
-  // style.textContent = get_theme()
-  // Get and inject the CSS from virtual drive
-   const css = await sdb.drive.get('style/theme.css')
-   inject(css)
+    // const style = document.createElement('style')
+    // style.textContent = get_theme()
+    // Get and inject the CSS from virtual drive
+    const css = await sdb.drive.get('style/theme.css')
+    inject(css)
 
-  shadow.append(rsi)//, style)
+    shadow.append(rsi)//, style)
 
   return el
 
@@ -750,19 +749,18 @@ function onbatch(batch) {
   }
 }
 
+function inject(data) {
+   console.log('Injecting style:', data)
+   const sheet = new CSSStyleSheet()
 
-  function inject(data) {
-    console.log('Injecting style:', data)
-    const sheet = new CSSStyleSheet()
-
-    if (data?.raw) {
+   if (data?.raw) {
     sheet.replaceSync(data.raw || '') // ensure raw exists
     shadow.adoptedStyleSheets = [sheet]
     }
   }
 
 
-    function handleValue(data) {
+function handleValue(data) {
     console.log(`✅ SID "${data.id}" value is now:`, data.value)
   }
  
@@ -776,10 +774,9 @@ function fallback_module () {
   return {
     drive: {},
     api: fallback_instance,// Used to customize API (like styles or icons)
-    
     _: {
       'range-slider-state-version-hr': {
-        $: '', 
+        $: '',
         // mapping: {
         //   style: 'style',
         //   data: 'data'
@@ -798,6 +795,14 @@ function fallback_module () {
   function fallback_instance(opts) {
   //console.log('make instance:', opts);
   return {
+    _: {
+      'range-slider-state-version-hr': {
+         0: { value: { min: 0, max: 10 }  },
+      },
+
+      'input-integer-state-version-hr': {
+         0: { value: { min: 0, max: 10 }  },
+      },
     drive: {
       'style/': {
         'theme.css': {
@@ -818,6 +823,7 @@ function fallback_module () {
           }
         }
     }
+  }
   };
 }
 
