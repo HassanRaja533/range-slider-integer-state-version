@@ -30,8 +30,9 @@
     rsi.classList.add('rsi')
     const subs = await sdb.watch(onbatch)
     console.log(subs)
-    const range_slider = await range(subs[0], protocol)
     const input_integer = await integer(subs[1], protocol)
+    
+    const range_slider = await range(subs[0], protocol)
     
   
     rsi.append(range_slider, input_integer)
@@ -105,17 +106,10 @@ function fallback_module () {
     _: {
       'range-slider-state-version-hr': {
         $: '',
-        // mapping: {
-        //   style: 'style',
-        //   data: 'data'
-        // }
+       
       },
       'input-integer-state-version-hr': {
         $: '',
-        // mapping: {
-        //   style: 'style',
-        //   data: 'data'
-        // }
       }
     }
   }
@@ -123,14 +117,6 @@ function fallback_module () {
   function fallback_instance(opts) {
   //console.log('make instance:', opts);
   return {
-    _: {
-      'range-slider-state-version-hr': {
-         0: { value: { min: 0, max: 10 }  },
-      },
-
-      'input-integer-state-version-hr': {
-         0: { value: { min: 0, max: 10 }  },
-      },
     drive: {
       'style/': {
         'theme.css': {
@@ -150,9 +136,26 @@ function fallback_module () {
             raw: opts 
           }
         }
+    },
+    _: {
+      'range-slider-state-version-hr': {
+         0: { value: { min: 0, max: 10 }  },
+         mapping: {
+          style: 'style',
+          data: 'data'
+        }
+      },
+
+      'input-integer-state-version-hr': {
+         0: { value: { min: 0, max: 10 }  },
+         mapping: {
+          style: 'style',
+          data: 'data'
+        }
+      }
     }
+    
   }
   };
 }
 
-}
