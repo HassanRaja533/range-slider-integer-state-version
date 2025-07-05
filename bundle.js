@@ -692,7 +692,7 @@ function fallback_module () {
     style: inject
   }
   
-    await sdb.watch(onbatch)
+   // await sdb.watch(onbatch)
    
   //const config = await sdb.drive.get('data/opts.json')
 
@@ -702,12 +702,14 @@ function fallback_module () {
 
     const rsi = document.createElement('div')
     rsi.classList.add('rsi')
-
-    const input_integer = await integer(opts.sid, protocol)
-    const range_slider = await range(opts.sid, protocol)
-  
+    const subs = await sdb.watch(onbatch)
+    console.log(subs)
+    const range_slider = await range(subs[0], protocol)
+    const input_integer = await integer(subs[1], protocol)
+    
   
     rsi.append(range_slider, input_integer)
+
 
     // const style = document.createElement('style')
     // style.textContent = get_theme()
