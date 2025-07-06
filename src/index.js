@@ -13,14 +13,12 @@
    console.log('SID:', opts.sid)
    const { id, sdb } = await get(opts.sid)
 
-  const on = {
-    value: handleValue,
-    style: inject
-  }
+   const on = {
+     value: handleValue,
+     style: inject
+   }
   
-   // await sdb.watch(onbatch)
-   
-  //const config = await sdb.drive.get('data/opts.json')
+    //const config = await sdb.drive.get('data/opts.json')
 
     const state = {}
     const el = document.createElement('div')
@@ -30,17 +28,12 @@
     rsi.classList.add('rsi')
     const subs = await sdb.watch(onbatch)
     console.log(subs)
+
+    const range_slider = await range(subs[0], protocol)
     const input_integer = await integer(subs[1], protocol)
     
-    const range_slider = await range(subs[0], protocol)
-    
-  
     rsi.append(range_slider, input_integer)
 
-
-    // const style = document.createElement('style')
-    // style.textContent = get_theme()
-    // Get and inject the CSS from virtual drive
     const css = await sdb.drive.get('style/theme.css')
     inject(css)
 
@@ -49,6 +42,7 @@
   return el
 
   function protocol (message, notify) {
+     console.log(' protocol called by:', message.from)
     const { from } = message
     state[from] = { value: 0, notify }
     return listen
@@ -65,36 +59,35 @@
 
       notify({ type, data })
     }
+  
   }
 
-
-// Batch event dispatcher
-function onbatch(batch) {
-  console.log('📦 Watch triggered with batch:', batch)
-  for (const { type, data } of batch) {
+  // Batch event dispatcher
+  function onbatch(batch) {
+    console.log('📦 Watch triggered with batch:', batch)
+    for (const { type, data } of batch) {
     if (on[type]) {
       on[type](data)
     }
-  }
-}
+   }
+ }
 
-function inject(data) {
-   console.log('Injecting style:', data)
-   const sheet = new CSSStyleSheet()
+  function inject(data) {
+    console.log('Injecting style:', data)
+    const sheet = new CSSStyleSheet()
 
-   if (data?.raw) {
-    sheet.replaceSync(data.raw || '') // ensure raw exists
-    shadow.adoptedStyleSheets = [sheet]
-    }
-  }
+    if (data?.raw) {
+     sheet.replaceSync(data.raw || '') // ensure raw exists
+     shadow.adoptedStyleSheets = [sheet]
+     }
+   }
 
 
-function handleValue(data) {
+  function handleValue(data) {
     console.log(`✅ SID "${data.id}" value is now:`, data.value)
   }
  
 }
-
 
 // ============ Fallback Setup for STATE ============
 
@@ -122,11 +115,11 @@ function fallback_module () {
         'theme.css': {
           raw: `
             .rsi {
-              padding: 5%;
-              display: grid;
-              grid-template-columns: 8fr 1fr;
-              align-items: center;
-              justify-items: center;
+              padding: 5%
+              display: grid
+              grid-template-columns: 8fr 1fr
+              align-items: center
+              justify-items: center
             }
           `
         }

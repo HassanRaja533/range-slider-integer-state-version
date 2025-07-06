@@ -1,0 +1,47 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Debug Frontend in Chrome",
+      "url": "http://192.168.18.41:9967",
+      "webRoot": "${workspaceFolder}"
+    }
+  ]
+}
+
+
+
+// {
+//   "version": "0.2.0",
+//   "configurations": [
+//     {
+//       "name": "Launch Node Server",
+//       "type": "node",
+//       "request": "launch",
+//       "program": "${workspaceFolder}/src/index.js",  // ✅ your entry file
+//       "runtimeArgs": [
+//         "--nolazy"
+//       ],
+//       "env": {
+//         "PORT": "9967"
+//       },
+//       "console": "integratedTerminal"
+//     },
+//     {
+//       "name": "Attach to Chrome",
+//       "port": 9967,
+//       "request": "attach",
+//       "type": "chrome",
+//       "webRoot": "${workspaceFolder}"
+//     },
+//     {
+//       "type": "chrome",
+//       "request": "launch",
+//       "name": "Launch Chrome against localhost",
+//       "url": "http://localhost:8080",
+//       "webRoot": "${workspaceFolder}"
+//     }
+//   ]
+// }
